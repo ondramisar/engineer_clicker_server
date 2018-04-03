@@ -107,7 +107,8 @@ func CreateMachine(w http.ResponseWriter, req *http.Request) {
 		log.Fatalf("Failed to: %v", err)
 	}
 
-	json.NewEncoder(w).Encode(dsnap)
+	_ = dsnap
+	json.NewEncoder(w).Encode("succ")
 }
 
 func GetDefaultWorkersEndpoint(w http.ResponseWriter, req *http.Request) {
@@ -179,6 +180,32 @@ func GetUserWorkersEndpoint(w http.ResponseWriter, req *http.Request) {
 
 	}
 	json.NewEncoder(w).Encode(userWorkers)
+}
+
+func CreateWorker(w http.ResponseWriter, req *http.Request) {
+
+	var person UsertWorker
+	_ = json.NewDecoder(req.Body).Decode(&person)
+
+	ctx := appengine.NewContext(req)
+	//config := &firebase.Config{ProjectID: "fluffy-fox-project"}
+	app, err := firebase.NewApp(ctx, nil, option.WithCredentialsFile("fluffy-fox-project-firebase-adminsdk-wkhyq-b6739bc93c.json"))
+	if err != nil {
+		log.Fatalf("Failed to client: %v", err)
+	}
+
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		log.Fatalf("Failed to: %v", err)
+	}
+
+	dsnap, err := client.Collection("UserWorker").Doc(person.ID).Set(ctx, person)
+	if err != nil {
+		log.Fatalf("Failed to: %v", err)
+	}
+
+	_ = dsnap
+	json.NewEncoder(w).Encode("succ")
 }
 
 func GetDefaultMaterialsEndpoint(w http.ResponseWriter, req *http.Request) {
@@ -344,6 +371,7 @@ func init() {
 
 	router.HandleFunc("/defaultWorkers", GetDefaultWorkersEndpoint).Methods("GET")
 	router.HandleFunc("/userWorkers/{id}", GetUserWorkersEndpoint).Methods("GET")
+	router.HandleFunc("/createWorker", CreateWorker).Methods("GET")
 
 	router.HandleFunc("/defaultMaterials", GetDefaultMaterialsEndpoint).Methods("GET")
 	router.HandleFunc("/userMaterials/{id}", GetUserMaterialsEndpoint).Methods("GET")

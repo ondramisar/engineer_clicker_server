@@ -25,7 +25,7 @@ type DefaultWorker struct {
 	Name      string   `firestore:"name,omitempty"`
 	TimeCutBy  				float64   `firestore:"timeCutBy,omitempty"`
 	MaterialMultiplayer		int   	`firestore:"materialMultiplayer,omitempty"`
-	Payment					int		`firestore:"payment,omitemp"`
+	Payment					int		`firestore:"payment,omitempty"`
 }
 
 type UsertWorker struct {
