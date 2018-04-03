@@ -33,7 +33,7 @@ type UsertWorker struct {
 	Name      string   `firestore:"name,omitempty"`
 	TimeCutBy  				float64   `firestore:"timeCutBy,omitempty"`
 	MaterialMultiplayer		int   	`firestore:"materialMultiplayer,omitempty"`
-	Payment					int		`firestore:"payment,omitemp"`
+	Payment					int		`firestore:"payment,omitempty"`
 	Lvl			int	`firestore:"lvl,omitempty"`
 	IsOnMachine			bool	`firestore:"isOnMachine,omitempty"`
 	IdUser		string `firestore:"idUser,omitempty"`

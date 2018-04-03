@@ -371,7 +371,7 @@ func init() {
 
 	router.HandleFunc("/defaultWorkers", GetDefaultWorkersEndpoint).Methods("GET")
 	router.HandleFunc("/userWorkers/{id}", GetUserWorkersEndpoint).Methods("GET")
-	router.HandleFunc("/createWorker", CreateWorker).Methods("GET")
+	router.HandleFunc("/createWorker", CreateWorker).Methods("POST")
 
 	router.HandleFunc("/defaultMaterials", GetDefaultMaterialsEndpoint).Methods("GET")
 	router.HandleFunc("/userMaterials/{id}", GetUserMaterialsEndpoint).Methods("GET")
