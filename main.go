@@ -14,6 +14,7 @@ import (
 	"firebase.google.com/go"
 	"google.golang.org/api/option"
 	"google.golang.org/api/iterator"
+	"cloud.google.com/go/firestore"
 )
 
 func GetDefaultMachinesEndpoint(w http.ResponseWriter, req *http.Request) {
@@ -66,7 +67,7 @@ func GetUserMachinesEndpoint(w http.ResponseWriter, req *http.Request) {
 		log.Fatalf("Failed to: %v", err)
 	}
 
-	doc := client.Collection("UsersMachines").Where("idUser","==",params["id"]).Documents(ctx)
+	doc := client.Collection("UsersMachines").Where("idUser", "==", params["id"]).Documents(ctx)
 	for {
 		doc, err := doc.Next()
 		if err == iterator.Done {
@@ -108,6 +109,64 @@ func CreateMachine(w http.ResponseWriter, req *http.Request) {
 	}
 
 	_ = dsnap
+	json.NewEncoder(w).Encode("succ")
+}
+
+func AddWorkerToMachine(w http.ResponseWriter, req *http.Request) {
+	var id string
+	_ = json.NewDecoder(req.Body).Decode(id)
+
+	params := mux.Vars(req)
+
+	ctx := appengine.NewContext(req)
+	//config := &firebase.Config{ProjectID: "fluffy-fox-project"}
+	app, err := firebase.NewApp(ctx, nil, option.WithCredentialsFile("fluffy-fox-project-firebase-adminsdk-wkhyq-b6739bc93c.json"))
+	if err != nil {
+		log.Fatalf("Failed to client: %v", err)
+	}
+
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		log.Fatalf("Failed to: %v", err)
+	}
+
+	doc, err := client.Collection("UsersMachines").Doc(params["id"]).Set(ctx, map[string]interface{}{
+		"workerId": params["id2"],
+	}, firestore.MergeAll)
+	if err != nil {
+		log.Fatalf("Failed to: %v", err)
+	}
+
+	_ = doc
+	json.NewEncoder(w).Encode("succ")
+}
+
+func RemoveWorkerToMachine(w http.ResponseWriter, req *http.Request) {
+	var id string
+	_ = json.NewDecoder(req.Body).Decode(id)
+
+	params := mux.Vars(req)
+
+	ctx := appengine.NewContext(req)
+	//config := &firebase.Config{ProjectID: "fluffy-fox-project"}
+	app, err := firebase.NewApp(ctx, nil, option.WithCredentialsFile("fluffy-fox-project-firebase-adminsdk-wkhyq-b6739bc93c.json"))
+	if err != nil {
+		log.Fatalf("Failed to client: %v", err)
+	}
+
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		log.Fatalf("Failed to: %v", err)
+	}
+
+	doc, err := client.Collection("UsersMachines").Doc(params["id"]).Set(ctx, map[string]interface{}{
+		"workerId": "",
+	}, firestore.MergeAll)
+	if err != nil {
+		log.Fatalf("Failed to: %v", err)
+	}
+
+	_ = doc
 	json.NewEncoder(w).Encode("succ")
 }
 
@@ -163,7 +222,7 @@ func GetUserWorkersEndpoint(w http.ResponseWriter, req *http.Request) {
 		log.Fatalf("Failed to: %v", err)
 	}
 
-	doc := client.Collection("UserWorker").Where("idUser","==",params["id"]).Documents(ctx)
+	doc := client.Collection("UserWorker").Where("idUser", "==", params["id"]).Documents(ctx)
 	for {
 		doc, err := doc.Next()
 		if err == iterator.Done {
@@ -260,7 +319,7 @@ func GetUserMaterialsEndpoint(w http.ResponseWriter, req *http.Request) {
 		log.Fatalf("Failed to: %v", err)
 	}
 
-	doc := client.Collection("UserMaterial").Where("idUser","==",params["id"]).Documents(ctx)
+	doc := client.Collection("UserMaterial").Where("idUser", "==", params["id"]).Documents(ctx)
 	for {
 		doc, err := doc.Next()
 		if err == iterator.Done {
@@ -300,12 +359,12 @@ func CreateUser(w http.ResponseWriter, req *http.Request) {
 		log.Fatalf("Failed to: %v", err)
 	}
 
-	doc, err := client.Collection("User").Doc(person.IdUser).Set(ctx,person)
+	doc, err := client.Collection("User").Doc(person.IdUser).Set(ctx, person)
 	if err != nil {
 		log.Fatalf("Failed to: %v", err)
 	}
 	_ = doc
-	json.NewEncoder(w).Encode("succ " )
+	json.NewEncoder(w).Encode("succ ")
 }
 
 func UpdateUser(w http.ResponseWriter, req *http.Request) {
@@ -324,12 +383,12 @@ func UpdateUser(w http.ResponseWriter, req *http.Request) {
 		log.Fatalf("Failed to: %v", err)
 	}
 
-	doc, err := client.Collection("User").Doc(person.IdUser).Set(ctx,person)
+	doc, err := client.Collection("User").Doc(person.IdUser).Set(ctx, person)
 	if err != nil {
 		log.Fatalf("Failed to: %v", err)
 	}
 	_ = doc
-	json.NewEncoder(w).Encode("succ " )
+	json.NewEncoder(w).Encode("succ ")
 }
 
 func GetUserEndpoint(w http.ResponseWriter, req *http.Request) {
@@ -368,6 +427,8 @@ func init() {
 	router.HandleFunc("/defaultMachines", GetDefaultMachinesEndpoint).Methods("GET")
 	router.HandleFunc("/userMachines/{id}", GetUserMachinesEndpoint).Methods("GET")
 	router.HandleFunc("/createMachine", CreateMachine).Methods("POST")
+	router.HandleFunc("/addWorker/{id}/{id2}", AddWorkerToMachine).Methods("POST")
+	router.HandleFunc("/removeWorker/{id}", AddWorkerToMachine).Methods("POST")
 
 	router.HandleFunc("/defaultWorkers", GetDefaultWorkersEndpoint).Methods("GET")
 	router.HandleFunc("/userWorkers/{id}", GetUserWorkersEndpoint).Methods("GET")
