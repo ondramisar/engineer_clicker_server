@@ -12,7 +12,7 @@ type DefaultMachine struct {
 type UserMachine struct {
 	ID        string   `firestore:"id,omitempty"`
 	Name      string   `firestore:"name,omitempty"`
-	TimeToReach  int   `firestore:"timeToReach,omitempty"`
+	TimeToReach  int64   `firestore:"timeToReach,omitempty"`
 	NumberOfMaterialsToGive		 int   `firestore:"numberOfMaterialsToGive,omitempty"`
 	IdMaterialToGive		string	`firestore:"idMaterialToGive,omitempty"`
 	Lvl			int	`firestore:"lvl,omitempty"`
@@ -28,10 +28,10 @@ type DefaultWorker struct {
 	Payment					int		`firestore:"payment,omitempty"`
 }
 
-type UsertWorker struct {
+type UserWorker struct {
 	ID        string   `firestore:"id,omitempty"`
 	Name      string   `firestore:"name,omitempty"`
-	TimeCutBy  				float64   `firestore:"timeCutBy,omitempty"`
+	TimeCutBy  					float64   `firestore:"timeCutBy,omitempty"`
 	MaterialMultiplayer		int   	`firestore:"materialMultiplayer,omitempty"`
 	Payment					int		`firestore:"payment,omitempty"`
 	Lvl			int	`firestore:"lvl,omitempty"`
@@ -49,7 +49,7 @@ type UserMaterial struct{
 	ID			string 		 `firestore:"id,omitempty"`
 	Value		int				 `firestore:"value,omitempty"`
 	Name 		string			 `firestore:"name,omitempty"`
-	NumberOf		int				 `firestore:"numberOf,omitempty"`
+	NumberOf		int64				 `firestore:"numberOf,omitempty"`
 	IdUser		string `firestore:"idUser,omitempty"`
 }
 
@@ -59,6 +59,6 @@ type User struct{
 	Email	string	`firestore:"email,omitempty"`
 	Coins	 int	`firestore:"coins,omitempty"`
 	LastUpdateMaterial int	`firestore:"lastUpdateMaterial,omitempty"`
-	LastTimeOutOfApp	int	`firestore:"lastTimeOutOfApp,omitempty"`
-	LastPayment	int	`firestore:"lastPayment,omitempty"`
+	LastTimeOutOfApp	int64	`firestore:"lastTimeOutOfApp,omitempty"`
+	LastPayment	int64	`firestore:"lastPayment,omitempty"`
 }
