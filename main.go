@@ -18,7 +18,6 @@ import (
 	"time"
 )
 
-
 var userLink = "User"
 var userMachineLink = "UsersMachines"
 var userWorkerLink = "UserWorker"
@@ -332,6 +331,30 @@ func GetUserMaterialsEndpoint(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(material)
 }
 
+func CreateMaterial(w http.ResponseWriter, req *http.Request) {
+	var userMaterial UserMaterial
+	_ = json.NewDecoder(req.Body).Decode(&userMaterial)
+
+	ctx := appengine.NewContext(req)
+	app, err := firebase.NewApp(ctx, nil, option.WithCredentialsFile("fluffy-fox-project-firebase-adminsdk-wkhyq-b6739bc93c.json"))
+	if err != nil {
+		log.Fatalf("Failed to client: %v", err)
+	}
+
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		log.Fatalf("Failed to: %v", err)
+	}
+
+	dsnap, err := client.Collection(userMaterialLink).Doc(userMaterial.ID).Set(ctx, userMaterial)
+	if err != nil {
+		log.Fatalf("Failed to: %v", err)
+	}
+
+	_ = dsnap
+	json.NewEncoder(w).Encode("succ")
+}
+
 func CreateUser(w http.ResponseWriter, req *http.Request) {
 	var person User
 	_ = json.NewDecoder(req.Body).Decode(&person)
@@ -430,7 +453,6 @@ func UpdateLastOutOfApp(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode("succ ")
 }
 
-
 func UpdateBackgroundUser(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
 
@@ -500,7 +522,7 @@ func UpdateBackgroundUser(w http.ResponseWriter, req *http.Request) {
 	lastPayment := user.LastPayment
 
 	dayToday := time.Now().Day()
-	dayOfLastPayment := time.Unix(0, lastPayment * int64(time.Millisecond)).Day()
+	dayOfLastPayment := time.Unix(0, lastPayment*int64(time.Millisecond)).Day()
 	difference := dayToday - dayOfLastPayment
 
 	if difference >= 1 {
@@ -560,14 +582,15 @@ func init() {
 	router.HandleFunc("/defaultWorkers", GetDefaultWorkersEndpoint).Methods("GET")
 	router.HandleFunc("/userWorkers/{id}", GetUserWorkersEndpoint).Methods("GET")
 	router.HandleFunc("/createWorker", CreateWorker).Methods("POST")
-	router.HandleFunc("/lastOutOfApp/{id}", UpdateLastOutOfApp).Methods("POST")
 
 	router.HandleFunc("/defaultMaterials", GetDefaultMaterialsEndpoint).Methods("GET")
 	router.HandleFunc("/userMaterials/{id}", GetUserMaterialsEndpoint).Methods("GET")
+	router.HandleFunc("/createMaterial", CreateMaterial).Methods("POST")
 
 	router.HandleFunc("/user", CreateUser).Methods("POST")
 	router.HandleFunc("/user/{id}", GetUserEndpoint).Methods("GET")
 	router.HandleFunc("/updateUser/{id}", UpdateUser).Methods("POST")
+	router.HandleFunc("/lastOutOfApp/{id}", UpdateLastOutOfApp).Methods("POST")
 
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, router))
 }
