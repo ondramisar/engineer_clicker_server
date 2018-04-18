@@ -207,7 +207,7 @@ func GetDefaultWorkersEndpoint(w http.ResponseWriter, req *http.Request) {
 }
 
 func GetUserWorkersEndpoint(w http.ResponseWriter, req *http.Request) {
-	var userWorkers []UserMachine
+	var userWorkers []UserWorker
 	params := mux.Vars(req)
 
 	ctx := appengine.NewContext(req)
@@ -230,7 +230,7 @@ func GetUserWorkersEndpoint(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			log.Fatalf("Failed to: %v", err)
 		}
-		var c UserMachine
+		var c UserWorker
 		doc.DataTo(&c)
 		c.ID = doc.Ref.ID
 		fmt.Printf("Document data: %#v\n", c)
@@ -241,7 +241,7 @@ func GetUserWorkersEndpoint(w http.ResponseWriter, req *http.Request) {
 }
 
 func CreateWorker(w http.ResponseWriter, req *http.Request) {
-	var person UserMachine
+	var person UserWorker
 	_ = json.NewDecoder(req.Body).Decode(&person)
 
 	ctx := appengine.NewContext(req)
