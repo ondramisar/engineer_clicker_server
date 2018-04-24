@@ -355,6 +355,35 @@ func CreateMaterial(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode("succ")
 }
 
+func UpdateUserMaterialNumberOf(w http.ResponseWriter, req *http.Request) {
+	var material UserMaterial
+	_ = json.NewDecoder(req.Body).Decode(&material)
+
+	params := mux.Vars(req)
+
+	ctx := appengine.NewContext(req)
+	app, err := firebase.NewApp(ctx, nil, option.WithCredentialsFile("fluffy-fox-project-firebase-adminsdk-wkhyq-b6739bc93c.json"))
+	if err != nil {
+		log.Fatalf("Failed to client: %v", err)
+	}
+
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		log.Fatalf("Failed to: %v", err)
+	}
+
+	materialUpdate, err := client.Collection(userMaterialLink).Doc(params["id"]).Set(ctx, map[string]interface{}{
+		"numberOf": material.NumberOf,
+	}, firestore.MergeAll)
+
+	if err != nil {
+		log.Fatalf("Failed to: %v", err)
+	}
+	_ = materialUpdate
+
+	json.NewEncoder(w).Encode("succ ")
+}
+
 func CreateUser(w http.ResponseWriter, req *http.Request) {
 	var person User
 	_ = json.NewDecoder(req.Body).Decode(&person)
@@ -586,6 +615,7 @@ func init() {
 	router.HandleFunc("/defaultMaterials", GetDefaultMaterialsEndpoint).Methods("GET")
 	router.HandleFunc("/userMaterials/{id}", GetUserMaterialsEndpoint).Methods("GET")
 	router.HandleFunc("/createMaterial", CreateMaterial).Methods("POST")
+	router.HandleFunc("/updateMaterialNumberOf/{id}", UpdateUserMaterialNumberOf).Methods("POST")
 
 	router.HandleFunc("/user", CreateUser).Methods("POST")
 	router.HandleFunc("/user/{id}", GetUserEndpoint).Methods("GET")
