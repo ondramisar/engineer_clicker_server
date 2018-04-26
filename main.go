@@ -537,8 +537,18 @@ func UpdateBackgroundUser(w http.ResponseWriter, req *http.Request) {
 			userMaterialDoc.DataTo(&userMaterial)
 			userMaterial.IdUser = userMaterialDoc.Ref.ID
 
+			userWorkerSnap, err := client.Collection(userWorkerLink).Doc(mach.WorkerId).Get(ctx)
+			if err != nil {
+				log.Fatalf("Failed to: %v", err)
+			}
+			var worker UserWorker
+			userWorkerSnap.DataTo(&worker)
+			worker.IdUser = userWorkerSnap.Ref.ID
+
+
+			var numberToGive = userMaterial.NumberOf + (machTime * int64(mach.NumberOfMaterialsToGive*worker.MaterialMultiplayer))
 			doc, err := client.Collection(userMaterialLink).Doc(mach.IdMaterialToGive).Set(ctx, map[string]interface{}{
-				"numberOf": userMaterial.NumberOf + machTime,
+				"numberOf": numberToGive,
 			}, firestore.MergeAll)
 
 			if err != nil {

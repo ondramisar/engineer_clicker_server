@@ -6,6 +6,7 @@ type DefaultMachine struct {
 	Name      string   `firestore:"name,omitempty"`
 	TimeToReach  int   `firestore:"timeToReach,omitempty"`
 	Cost		 int   `firestore:"cost,omitempty"`
+	NumberOfMaterialsToGive		 int   `firestore:"numberOfMaterialsToGive,omitempty"`
 	IdMaterialToGive	string	`firestore:"idMaterialToGive,omitempty"`
 }
 
