@@ -51,6 +51,7 @@ type UserMaterial struct{
 	Value		int				 `firestore:"value,omitempty"`
 	Name 		string			 `firestore:"name,omitempty"`
 	NumberOf		int64				 `firestore:"numberOf,omitempty"`
+	DefaultMaterialId 		string 	`firestore:"defaultMaterialId,omitempty"`
 	IdUser		string `firestore:"idUser,omitempty"`
 }
 
